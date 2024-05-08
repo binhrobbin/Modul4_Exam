@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="/layout :: head">
+    <title>List Product</title>
+</head>
+<body>
+<h3>Sản phẩm</h3>
+<span>
+    <a th:href="@{/productTypes}">
+        Quản lý Sản phẩm
+    </a>
+</span>
+<span style="margin-left: 82%">
+    <a th:href="@{/products/create}">
+       + Thêm Sản Phẩm
+    </a>
+</span>
+<div style="margin-bottom: 10px; margin-left: 110px">
+    <form th:action="@{/products/search}" method="get">
+        <label><input type="text" name="search" th:value="${keyword}"></label>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</div>
+<div class="notify">
+    <div th:if="${message}">
+        <span th:text="${message}"></span>
+    </div>
+</div>
+
+<table id = "products">
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>Chọn</th>
+        <th>Tên Sản Phẩm</th>
+        <th>Giá bắt đầu</th>
+        <th>Loại sản phẩm</th>
+        <th>Tình trạng</th>
+        <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c,cStatus : ${products}">
+        <td th:text="${cStatus.count}"></td>
+        <td> <input type="checkbox"></td>
+        <td th:text="${c.name}"></td>
+        <td th:text="${c.price}"></td>
+        <td th:text="${c.productType.name}"></td>
+        <td th:text="${c.status}"></td>
+        <td><a th:href="@{/customers/update/{id}(id=${c.getId()})}" style="text-decoration: none">Sửa</a></td>
+<!--        <td><a th:href="@{/customers/delete/{id}(id=${c.getId()})}">Xóa</a></td>-->
+    </tr>
+    </tbody>
+</table>
+<br>
+<a class="btn btn-primary" th:if="${products.hasPrevious()}" th:href="@{/products(page=${products.number - 1})}">Previous</a>
+<span th:text="${products.number + 1}"></span> / <span th:text="${products.totalPages}"></span>
+<a class="btn btn-primary" th:if="${products.hasNext()}" th:href="@{/products(page=${products.number + 1})}">Next</a>
+<footer th:replace="/layout :: footer"></footer>
+</body>
+</html>
