@@ -2,11 +2,14 @@ package vn.codegym.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class ProductType {
 
     @Id
@@ -16,4 +19,7 @@ public class ProductType {
 
     @OneToMany(mappedBy = "productType")
     private List<Product> productList;
+
+    public ProductType() {
+    }
 }

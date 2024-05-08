@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +27,15 @@ public class ProductController {
     private IProductTypeService productTypeService;
 
 //    @ModelAttribute("productTypes")
-//    public Iterable<Province> listProvinces() {
+//    public Iterable<Province> listProductTypes() {
 //        return provinceService.findAll();
 //    }
 
     @GetMapping
     public ModelAndView listProducts(@PageableDefault(value = 5) Pageable pageable){
-        Page<Product> Products = productService.findAll(pageable);
+        Page<Product> products = productService.findAll(pageable);
         ModelAndView modelAndView = new ModelAndView("/product/list");
-        modelAndView.addObject("products", Products);
+        modelAndView.addObject("products", products);
         return modelAndView;
     }
 
@@ -48,28 +49,32 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public String create(@Validated @ModelAttribute("product") Product product,
-                         RedirectAttributes redirectAttributes, BindingResult bindingResult) {
-        System.out.println(1);
-        if (bindingResult.hasFieldErrors()) return "/product/create";
+    public String create(@Validated @ModelAttribute("product") Product product, BindingResult bindingResult,
+                         RedirectAttributes redirectAttributes, Model model) {
+        if (bindingResult.hasFieldErrors()){
+            model.addAttribute("productTypeList",  productTypeService.findAll());
+            return "/product/create";
+        }
         productService.save(product);
         redirectAttributes.addFlashAttribute("message", "Tạo mới thành công");
         return "redirect:/products";
     }
 
-//    @GetMapping("/search")
-//    public ModelAndView listProductsSearch(@RequestParam(value = "search") Optional<String> search, Pageable pageable){
-//        Page<Product> Products;
-//        ModelAndView modelAndView = new ModelAndView("/Product/list");
-//        if(search.isPresent()){
-//            Products = productService.findAllByNameContaining(pageable, search.get());
-//            modelAndView.addObject("keyword", search.get());
-//        } else {
-//            Products = productService.findAll(pageable);
-//        }
-//        modelAndView.addObject("Products", Products);
-//        return modelAndView;
-//    }
+    @GetMapping("/search")
+    public ModelAndView listProductsSearch(@RequestParam(value = "search") Optional<String> search,@PageableDefault(value = 5) Pageable pageable){
+        Page<Product> products;
+        ModelAndView modelAndView = new ModelAndView("/product/list");
+        if(search.isPresent()){
+            System.out.println(search.get());
+            products = productService.findAllByNameContaining(pageable, search.get());
+            modelAndView.addObject("keyword", search.get());
+            System.out.println(products.toString());
+        } else {
+            products = productService.findAll(pageable);
+        }
+        modelAndView.addObject("products", products);
+        return modelAndView;
+    }
 //
 //    @GetMapping("/update/{id}")
 //    public ModelAndView updateForm(@PathVariable Long id) {
